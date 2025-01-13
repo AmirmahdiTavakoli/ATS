@@ -1,42 +1,32 @@
-# مرحله اول: ساختن وابستگی‌ها
-FROM python:3.9-slim AS builder
+# Use a smaller base image
+FROM python:3.9-slim-buster
 
-# نصب ابزارهای لازم برای ساخت و اجرای پروژه
-RUN apt-get update && apt-get install -y --no-install-recommends gcc && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Set environment variables to minimize Python's caching and logs
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1
 
-# تنظیم دایرکتوری کاری
+# Set the working directory
 WORKDIR /app
 
-# کپی فایل‌های مورد نیاز
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install only necessary Python dependencies
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# نصب وابستگی‌ها بدون ذخیره کش
-RUN pip install --no-cache-dir -r requirements.txt && \
-    python -m spacy download en_core_web_sm
+# Download only the required SpaCy model
+RUN python -m spacy download en_core_web_sm
 
-# مرحله دوم: ایمیج نهایی
-FROM python:3.9-slim
-
-# تنظیم دایرکتوری کاری
-WORKDIR /app
-
-# کپی فقط فایل‌های مورد نیاز از مرحله قبلی
-COPY --from=builder /usr/local/lib/python3.9 /usr/local/lib/python3.9
-COPY --from=builder /usr/local/bin /usr/local/bin
-
-# کپی کدهای پروژه به ایمیج نهایی
+# Copy the rest of the application code
 COPY . .
 
-# تنظیم متغیرهای محیطی
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
-
-# حذف فایل‌های غیرضروری
-RUN apt-get purge -y gcc && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
-
-# پورت قابل دسترس
+# Expose the port used by the application
 EXPOSE 5000
 
-# فرمان اجرا
+# Run the application
 CMD ["python", "app.py"]
