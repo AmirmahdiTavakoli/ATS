@@ -5,17 +5,9 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Algorithm Description](#algorithm-description)
-- [Algorithm Summary](#algorithm-summary)
-- [Demo](#demo)
-- [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Project Structure](#project-structure)
-- [Technical Details](#technical-details)
-- [Troubleshooting](#troubleshooting)
-- [Future Enhancements](#future-enhancements)
-- [Contributing](#contributing)
-
 ---
 
 ## Introduction
@@ -29,10 +21,8 @@ The **Applicant Tracking System (ATS)** is a web application designed to streaml
 - **Upload Multiple CVs**: Support for uploading multiple CVs in PDF or TXT format.
 - **Job Description Parsing**: Ability to upload a job description in PDF or TXT format.
 - **Similarity Scoring**: Uses advanced NLP models to calculate the similarity between CVs and the job description.
-- **Real-time Progress Updates**: Displays a progress bar to indicate the processing status.
 - **Top N CVs Selection**: Allows users to specify the number of top CVs to retrieve.
 - **Download CVs**: Provides download links for the top-ranked CVs.
-- **Responsive UI**: User-friendly interface built with Bootstrap for responsive design.
 - **Dark Mode**: Option to toggle between light and dark themes.
 - **Security Measures**: Sanitizes file uploads to prevent malicious files from being processed.
 
@@ -76,49 +66,8 @@ The algorithm used in this application scores the similarity between candidates'
    - The client then redirects to the `/results/<sid>` path, where the stored results are displayed using a server-side template (`results.html`).
    - In the `results.html` template, Flask's `url_for` function is used to generate download links for each CV.
 
-9. **Download Functionality**:
-   - When the user clicks the "Download" button, a request is sent to the `/download/<folder>/<filename>` route.
-   - The server uses `send_from_directory` to send the file from the appropriate folder.
-
-10. **Real-Time Progress Updates**:
-    - During processing, after each CV is processed, the server sends the progress percentage to the client via the `progress_update` event.
-    - Client-side JavaScript uses this data to update the progress bar.
-
 ---
 
-## Algorithm Summary
-
-- **Use of NLP and Machine Learning**: The algorithm leverages natural language processing techniques and pre-trained models to convert textual data into numerical vectors that represent semantic meaning.
-- **Similarity Measurement**: Cosine similarity is employed to quantify how closely each CV matches the job description.
-- **Automation**: This automated process saves time on manual screening and enhances the efficiency of the recruitment workflow.
-
-**Key Technologies and Libraries Used**:
-
-- **Flask**: Serves as the web server and handles routing.
-- **Flask-SocketIO**: Enables real-time communication between the server and client.
-- **Eventlet**: Facilitates concurrent programming for handling multiple connections.
-- **pdfplumber**: Extracts text content from PDF files.
-- **spaCy**: Used for text preprocessing tasks like tokenization and lemmatization.
-- **SentenceTransformers**: Generates vector embeddings from text using advanced language models.
-- **scikit-learn**: Provides the `cosine_similarity` function for calculating similarity scores.
-
----
-
-## Demo
-
-![ATS System Demo](static/images/demo.gif)
-
----
-
-## Prerequisites
-
-Before you begin, ensure you have met the following requirements:
-
-- **Python 3.6 or higher**: The application is written in Python and requires Python 3.6+.
-- **Virtual Environment**: It's recommended to use a virtual environment to manage dependencies.
-- **Internet Connection**: Required to download necessary NLP models and libraries.
-
----
 
 ## Installation
 
@@ -249,7 +198,6 @@ Applicant-Tracking-System--ATS-/
 │
 ├── app.py
 ├── requirements.txt
-├── .env
 ├── templates/
 │   ├── index.html
 │   └── results.html
@@ -260,96 +208,17 @@ Applicant-Tracking-System--ATS-/
 │   │   └── scripts.js
 │   └── images/
 │       └── logo.png
-├── uploads/
-│   ├── cvs/
-│   └── job_description/
 └── README.md
 ```
 
 - **app.py**: Main Flask application file.
 - **templates/**: Contains HTML templates for the application.
 - **static/**: Contains static files like CSS, JavaScript, and images.
-- **uploads/**: Stores uploaded CVs and job descriptions.
 - **requirements.txt**: Lists all the Python dependencies.
-- **.env**: Environment variables (e.g., secret keys).
 - **README.md**: Project documentation.
 
 ---
 
-## Technical Details
 
-### 1. Backend
 
-- **Flask**: A lightweight web framework for Python.
-- **Flask-SocketIO**: Enables real-time communication between the client and server.
-- **Eventlet**: Provides support for asynchronous networking.
-- **NLP Libraries**:
-  - **spaCy**: Used for text preprocessing, including tokenization and lemmatization.
-  - **SentenceTransformers**: Provides pre-trained models for generating sentence embeddings.
-- **Machine Learning**:
-  - **scikit-learn**: Used for calculating cosine similarity between embeddings.
-- **PDF Parsing**:
-  - **pdfplumber**: Extracts text from PDF files.
 
-### 2. Frontend
-
-- **HTML/CSS**: Structure and styling of the web pages.
-- **Bootstrap 5**: Provides responsive design and pre-built components.
-- **JavaScript**:
-  - **Socket.IO Client**: Handles real-time communication with the server.
-  - **Fetch API**: Submits forms asynchronously to prevent page reloads.
-
----
-
-## Troubleshooting
-
-### 1. Common Issues
-
-- **Model Download Errors**: Ensure you have a stable internet connection when downloading NLP models.
-- **Port Already in Use**: If port 5000 is occupied, specify a different port when running the app:
-  ```bash
-  python app.py --port=5001
-  ```
-- **File Upload Limitations**: The default file upload size limit may need adjustment for large files.
-
-### 2. Log Monitoring
-
-- Check the terminal output where `app.py` is running for any error messages.
-- Use Flask's debug mode to get detailed error information:
-  ```python
-  socketio.run(app, debug=True)
-  ```
-
-### 3. Dependency Issues
-
-- If you encounter issues with package versions, ensure all packages are updated:
-  ```bash
-  pip install --upgrade -r requirements.txt
-  ```
-
----
-
-## Future Enhancements
-
-- **Database Integration**: Store results and user sessions in a database.
-- **User Authentication**: Implement user login and session management.
-- **Email Notifications**: Send email alerts when processing is complete.
-- **Advanced Matching Algorithms**: Incorporate more sophisticated AI models for better matching accuracy.
-- **File Type Support**: Extend support to other file formats like DOCX.
-- **Scalability**: Deploy the application using a WSGI server like Gunicorn for production environments.
-
----
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. **Fork the Repository**: Create a personal fork of the project.
-2. **Create a Feature Branch**: Work on your feature or fix in a new branch.
-3. **Commit Your Changes**: Write clear and concise commit messages.
-4. **Push to Your Fork**: Push your changes to your forked repository.
-5. **Submit a Pull Request**: Describe your changes and submit a PR for review.
-
----
-
-![Logo](static/images/logo.jpeg)
