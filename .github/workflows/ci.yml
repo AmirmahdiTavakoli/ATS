@@ -1,0 +1,41 @@
+name: CI Pipeline for ATS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-test:
+    name: Linting and Testing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run linting
+      run: |
+        source venv/bin/activate
+        pip install flake8
+        flake8 .
+
+    - name: Run tests
+      run: |
+        source venv/bin/activate
+        pytest
