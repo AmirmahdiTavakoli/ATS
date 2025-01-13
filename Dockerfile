@@ -1,27 +1,42 @@
-# Use an official Python runtime as the base image
-FROM python:3.9-slim
+# مرحله اول: ساختن وابستگی‌ها
+FROM python:3.9-slim AS builder
 
-# Set the working directory in the container
+# نصب ابزارهای لازم برای ساخت و اجرای پروژه
+RUN apt-get update && apt-get install -y --no-install-recommends gcc && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# تنظیم دایرکتوری کاری
 WORKDIR /app
 
-# Copy the requirements file into the container
-COPY requirements.txt requirements.txt
+# کپی فایل‌های مورد نیاز
+COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# نصب وابستگی‌ها بدون ذخیره کش
+RUN pip install --no-cache-dir -r requirements.txt && \
+    python -m spacy download en_core_web_sm
 
-# Download SpaCy model
-RUN python -m spacy download en_core_web_sm
+# مرحله دوم: ایمیج نهایی
+FROM python:3.9-slim
 
-# Copy the rest of the application code into the container
+# تنظیم دایرکتوری کاری
+WORKDIR /app
+
+# کپی فقط فایل‌های مورد نیاز از مرحله قبلی
+COPY --from=builder /usr/local/lib/python3.9 /usr/local/lib/python3.9
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# کپی کدهای پروژه به ایمیج نهایی
 COPY . .
 
-# Set environment variables
+# تنظیم متغیرهای محیطی
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 
-# Expose the port the app runs on
+# حذف فایل‌های غیرضروری
+RUN apt-get purge -y gcc && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+
+# پورت قابل دسترس
 EXPOSE 5000
 
-# Command to run the application
+# فرمان اجرا
 CMD ["python", "app.py"]
